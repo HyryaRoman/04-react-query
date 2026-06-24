@@ -41,7 +41,7 @@ export default function App() {
       return await fetchMovies(query, page);
     },
     enabled: query !== "",
-    placeholderData: { movies: [], totalPages: 0 },
+    placeholderData: (previousData) => previousData,
   });
   const [shownMovie, setShownMovie] = useState<Movie | null>(null);
 
