@@ -14,29 +14,41 @@ const tmdb: AxiosInstance = axios.create({
 
 interface SearchResponse {
   results: Movie[];
+  total_pages: number;
+}
+
+export interface MovieList {
+  movies: Movie[];
+  totalPages: number;
 }
 
 export async function fetchMovies(
   query: string,
   page: number = 1,
-): Promise<Movie[]> {
+): Promise<MovieList> {
   if (FAKE_TMDB) {
     await new Promise((res) => setTimeout(res, 2000));
-    return [
-      {
-        id: 1,
-        poster_path: "#",
-        backdrop_path: "#",
-        title: "Dummy Movie",
-        overview: "Lorem ipsum dolor dit amen",
-        release_date: "2026/06/19",
-        vote_average: 4.9,
-      },
-    ];
+    return {
+      movies: [
+        {
+          id: 1,
+          poster_path: "#",
+          backdrop_path: "#",
+          title: "Dummy Movie",
+          overview: "Lorem ipsum dolor dit amen",
+          release_date: "2026/06/19",
+          vote_average: 4.9,
+        },
+      ],
+      totalPages: 1,
+    };
   } else {
     const response = await tmdb.get<SearchResponse>("/search/movie", {
       params: { query, page },
     });
-    return response.data.results;
+    return {
+      movies: response.data.results || [],
+      totalPages: response.data.total_pages || 0,
+    };
   }
 }
