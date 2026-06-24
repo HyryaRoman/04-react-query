@@ -1,5 +1,6 @@
 import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import SearchBar from "../SearchBar/SearchBar.tsx";
 import MovieGrid from "../MovieGrid/MovieGrid.tsx";
@@ -13,29 +14,22 @@ import { fetchMovies } from "../../services/movieService.ts";
 import type { Movie } from "../../types/movie.ts";
 
 export default function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [isError, setError] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>("");
+  const {
+    data: movies,
+    error,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["movies", query],
+    queryFn: async () => {
+      return await fetchMovies(query);
+    },
+    enabled: query !== "",
+  });
   const [shownMovie, setShownMovie] = useState<Movie | null>(null);
 
-  async function onSearch(query: string) {
-    try {
-      setMovies([]);
-      setLoading(true);
-      setError(false);
-
-      const result = await fetchMovies(query);
-      if (result.length > 0) {
-        setMovies(result);
-      } else {
-        toast.error("No movies found for your request.");
-      }
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }
+  console.error(error);
 
   function onMovieSelect(movie: Movie) {
     setShownMovie(movie);
@@ -48,10 +42,10 @@ export default function App() {
   return (
     <div className={styles.app}>
       <Toaster />
-      <SearchBar onSubmit={onSearch} />
+      <SearchBar onSubmit={setQuery} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies.length > 0 && (
+      {movies && movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={onMovieSelect} />
       )}
       {shownMovie && <MovieModal movie={shownMovie} onClose={onModalClose} />}
