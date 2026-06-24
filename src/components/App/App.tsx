@@ -70,7 +70,7 @@ export default function App() {
       <SearchBar onSubmit={handleSearch} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movieList.movies.length > 0 && (
+      {movieList && movieList.movies.length > 0 && (
         <>
           {movieList.totalPages > 1 && (
             <ReactPaginate
