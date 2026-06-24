@@ -1,4 +1,4 @@
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ReactPaginateModule from "react-paginate";
@@ -31,7 +31,6 @@ export default function App() {
   const [page, setPage] = useState<number>(1);
   const {
     data: movieList,
-    error,
     isLoading,
     isError,
   } = useQuery({
